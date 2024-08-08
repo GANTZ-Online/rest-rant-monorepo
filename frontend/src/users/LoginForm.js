@@ -1,37 +1,51 @@
-import { useContext, useState } from "react"
-import { useHistory } from "react-router"
-import { CurrentUser } from "../contexts/CurrentUser"
+import { useContext, useState } from 'react';
+import { useHistory } from 'react-router';
+import { CurrentUser } from '../contexts/CurrentUser';
 
 function LoginForm() {
-
-    const history = useHistory()
-
-    const { setCurrentUser } = useContext(CurrentUser)
+    const history = useHistory();
+    const { setCurrentUser } = useContext(CurrentUser);
 
     const [credentials, setCredentials] = useState({
         email: '',
         password: ''
-    })
+    });
 
-    const [errorMessage, setErrorMessage] = useState(null)
+    const [errorMessage, setErrorMessage] = useState(null);
 
     async function handleSubmit(e) {
-        e.preventDefault()
-       
+        e.preventDefault();
 
+        try {
+            const response = await fetch('http://localhost:5000/authentication/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(credentials)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {  // Check if the response status is OK
+                setCurrentUser(data.user);  // Set the current user from response data
+                history.push('/');  // Redirect to home page or appropriate route
+            } else {
+                setErrorMessage(data.message);  // Set error message from response data
+            }
+        } catch (error) {
+            setErrorMessage('An unexpected error occurred.');  // Generic error message
+        }
     }
 
     return (
         <main>
             <h1>Login</h1>
-            {errorMessage !== null
-                ? (
-                    <div className="alert alert-danger" role="alert">
-                        {errorMessage}
-                    </div>
-                )
-                : null
-            }
+            {errorMessage && (
+                <div className="alert alert-danger" role="alert">
+                    {errorMessage}
+                </div>
+            )}
             <form onSubmit={handleSubmit}>
                 <div className="row">
                     <div className="col-sm-6 form-group">
@@ -62,7 +76,7 @@ function LoginForm() {
                 <input className="btn btn-primary" type="submit" value="Login" />
             </form>
         </main>
-    )
+    );
 }
 
-export default LoginForm
+export default LoginForm;
