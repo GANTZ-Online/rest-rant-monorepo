@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { useHistory } from 'react-router';
+import { useHistory } from 'react-router-dom';
 import { CurrentUser } from '../contexts/CurrentUser';
 
 function LoginForm() {
@@ -17,7 +17,7 @@ function LoginForm() {
         e.preventDefault();
 
         try {
-            const response = await fetch('http://localhost:5000/authentication/', {
+            const response = await fetch('http://localhost:5001/authentication/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -29,12 +29,14 @@ function LoginForm() {
 
             if (response.ok) {  // Check if the response status is OK
                 setCurrentUser(data.user);  // Set the current user from response data
+                console.log(data.token); // Log the token if needed
                 history.push('/');  // Redirect to home page or appropriate route
             } else {
                 setErrorMessage(data.message);  // Set error message from response data
             }
         } catch (error) {
             setErrorMessage('An unexpected error occurred.');  // Generic error message
+            console.error('Login error:', error);  // Log error for debugging
         }
     }
 
@@ -73,10 +75,11 @@ function LoginForm() {
                         />
                     </div>
                 </div>
-                <input className="btn btn-primary" type="submit" value="Login" />
+                <button className="btn btn-primary" type="submit">Login</button>
             </form>
         </main>
     );
 }
 
 export default LoginForm;
+
