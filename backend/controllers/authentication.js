@@ -1,57 +1,67 @@
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
 const db = require("../models");
 const bcrypt = require('bcrypt');
+const jwt = require('json-web-token')
 
-const { User } = db;
+const {User} = db
 
-// Handle user login or authentication
+  
+  
 router.post('/', async (req, res) => {
-    try {
-        // Find user by email
-        const user = await User.findOne({
-            where: { email: req.body.email }
-        });
+    
+    let user = await User.findOne({
+        where: { email: req.body.email }
+    })
 
-        // Check if user exists and if the password is correct
-        if (!user || !await bcrypt.compare(req.body.password, user.passwordDigest)) {
-            return res.status(404).json({ 
-                message: 'Could not find a user with the provided email and password' 
-            });
-        }
-
-        // Respond with user data if authentication is successful
-        res.json({ user });
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+    if (!user || !await bcrypt.compare(req.body.password, user.passwordDigest)) {
+        res.status(404).json({ 
+            message: `Could not find a user with the provided username and password` 
+        })
+    } else {
+        const result = await jwt.encode(process.env.JWT_SECRET, {id: user.Id})
+        res.json({ user: user, token: result.value })
     }
-});
+})
 
-// Handle profile retrieval
+
 router.get('/profile', async (req, res) => {
-    console.log('made it to the profile page');
-    try {
-        // Extract userId from request (assuming it's passed as a query parameter or a header)
-        const userId = req.query.userId || req.headers['user-id'];
+    
+   try {
+        const [authenticationMethod, token] = req.header.autherization.split(' ')
 
-        // Find user by userId
-        const user = await User.findOne({
-            where: { userId }
-        });
-
-        // Respond with user data if found, otherwise respond with a 404
-        if (user) {
-            res.json(user);
-        } else {
-            res.status(404).json({ message: 'User not found' });
+        if(authenticationMethod!== 'Bearer'){
+            const result = await jwt.deccode(process.env.JWT_SECRET,  token);
+            const {id} = result.value;
+            
+            let user = await User.findOne({
+                where: {
+                    userId: id
+                }
+            })
+            res.json(user)
         }
 
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
+        
+        
+   } catch {
 
-module.exports = router;
+        res.json(null)
+   }
+})
+
+
+router.post('/super-important-route', async (req, res) => {
+    if(req.session.userId){
+        console.log('Do the really super important thing')
+        res.send('Done')
+    } else {
+        console.log('You are not authorized to do the super important thing')
+        res.send('Denied')
+    }
+})
+
+
+
+
+
+module.exports = router

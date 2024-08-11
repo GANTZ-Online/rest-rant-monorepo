@@ -4,20 +4,33 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
+const cookieSessions = require('cookie-session');
 
 // Express Settings
-app.use(cors());
-app.use(express.static('public'));
-app.use(express.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(cookieSessions({
+    name: 'session',
+    sameSite: 'strict',
+    keys:  [ process.env.SESSION_SECRET ],
+    maxAge: 24 * 60 * 60 * 1000 // 24 hour
+
+}));
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+}))
+app.use(express.static('public'))
+app.use(express.urlencoded({ extended: true }))
+app.use(bodyParser.json())
 
 // Controllers & Routes
-app.use('/places', require('./controllers/places'));
-app.use('/users', require('./controllers/users'));
-app.use('/authentication', require('./controllers/authentication'));  // Fixed missing closing parenthesis
+
+app.use(express.urlencoded({ extended: true }))
+
+app.use('/places', require('./controllers/places'))
+app.use('/users', require('./controllers/users'))
+app.use('/authentication', require('./controllers/authentication'))
 
 // Listen for Connections
-const PORT = process.env.PORT || 3000;  // Fallback to port 3000 if environment variable is not set
-app.listen(PORT, () => {
-    console.log(`Listening on port ${PORT}`);
-});
+app.listen(process.env.PORT, () => {
+    console.log(`Listening on ${process.env.PORT}`)
+})

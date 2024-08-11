@@ -1,29 +1,30 @@
-import { useState } from 'react';
-import { useHistory } from 'react-router';
+import { useState, useEffect } from "react"
+import { useHistory, useParams } from "react-router"
 
 function SignUpForm() {
-    const history = useHistory();
-    
+
+    const history = useHistory()
+
     const [user, setUser] = useState({
         firstName: '',
         lastName: '',
         email: '',
         password: ''
-    });
+    })
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        
-        await fetch('http://localhost:5000/users/', {
+    async function handleSubmit(e) {
+        e.preventDefault()
+
+        await fetch(`http://localhost:5001/users/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(user)
-        });
+        })
 
-        history.push('/');
-    };
+        history.push(`/`)
+    }
 
     return (
         <main>
@@ -35,7 +36,7 @@ function SignUpForm() {
                         <input
                             required
                             value={user.firstName}
-                            onChange={(e) => setUser({ ...user, firstName: e.target.value })}
+                            onChange={e => setUser({ ...user, firstName: e.target.value })}
                             className="form-control"
                             id="firstName"
                             name="firstName"
@@ -46,7 +47,7 @@ function SignUpForm() {
                         <input
                             required
                             value={user.lastName}
-                            onChange={(e) => setUser({ ...user, lastName: e.target.value })}
+                            onChange={e => setUser({ ...user, lastName: e.target.value })}
                             className="form-control"
                             id="lastName"
                             name="lastName"
@@ -60,29 +61,30 @@ function SignUpForm() {
                             type="email"
                             required
                             value={user.email}
-                            onChange={(e) => setUser({ ...user, email: e.target.value })}
+                            onChange={e => setUser({ ...user, email: e.target.value })}
                             className="form-control"
                             id="email"
                             name="email"
                         />
                     </div>
-                    <div className="col-sm-6 form-group">
-                        <label htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            required
-                            value={user.password}
-                            onChange={(e) => setUser({ ...user, password: e.target.value })}
-                            className="form-control"
-                            id="password"
-                            name="password"
-                        />
-                    </div>
                 </div>
+                <div className="col-sm-6 form-group">
+                    <label htmlFor="password">Password</label>
+                    <input
+                        type="password"
+                        required
+                        value={user.password}
+                        onChange={e => setUser({ ...user, password: e.target.value })}
+                        className="form-control"
+                        id="password"
+                        name="password"
+                    />
+                </div>
+
                 <input className="btn btn-primary" type="submit" value="Sign Up" />
             </form>
         </main>
-    );
+    )
 }
 
-export default SignUpForm;
+export default SignUpForm

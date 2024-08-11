@@ -1,4 +1,4 @@
-// import { createContext, useState, useEffect } from "react";
+// import { createContext, useEffect, useState } from "react";
 
 // export const CurrentUser = createContext();
 
@@ -7,23 +7,20 @@
 
 //     useEffect(() => {
 //         const getLoggedInUser = async () => {
-//             try {
-//                 let response = await fetch('http://localhost:5001/authentication/profile');
-//                 if (!response.ok) {
-//                     throw new Error('Network response was not ok');
+//             let response = await fetch('http://localhost:5001/authentication/profile', {
+//                 headers: {
+//                     'Authorization': `Bearer ${localStorage.getItem('token')}`
 //                 }
-//                 let user = await response.json();
-//                 console.log('user', user)
-//                 setCurrentUser(user);
-//             } catch (error) {
-//                 console.error('Error fetching user:', error);
-//             }
+//             });
+//             let user = await response.json();
+//             setCurrentUser(user);
 //         };
+
 //         getLoggedInUser();
 //     }, []);
 
 //     return (
-//         <CurrentUser.Provider value={currentUser}>
+//         <CurrentUser.Provider value={{ currentUser, setCurrentUser }}>
 //             {children}
 //         </CurrentUser.Provider>
 //     );
@@ -33,50 +30,31 @@
 
 import { createContext, useState, useEffect } from "react";
 
-export const CurrentUser = createContext();
 
-function CurrentUserProvider({ children }) {
-    const [currentUser, setCurrentUser] = useState(null);
-    const [userId, setUserId] = useState(null); // State for userId
+export const CurrentUser = createContext()
 
-    useEffect(() => {
-        // This could be replaced with the actual method of obtaining userId
-        // For example, you might have a function getUserId() or it might be in auth state
-        const fetchUserId = async () => {
-            // Example: Assume we have a function to get the logged-in user's ID
-            // const fetchedUserId = await getUserId();
-            // setUserId(fetchedUserId);
-            setUserId('exampleUserId'); // Replace with actual user ID logic
-        };
+function CurrentUserProvider({ children }){
 
-        fetchUserId();
-    }, []);
+    const [currentUser, setCurrentUser] = useState(null)
 
-    useEffect(() => {
-        const getLoggedInUser = async () => {
-            if (!userId) return; // Ensure userId is available before fetching user profile
-
-            try {
-                let response = await fetch(`http://localhost:5001/authentication/profile?userId=${userId}`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+    useEffect(()=>{
+        const getLoggedInUser = async () =>{
+            let response = await fetch('http://localhost:5001/authentication/profile', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
-                let user = await response.json();
-                console.log('user', user);
-                setCurrentUser(user);
-            } catch (error) {
-                console.error('Error fetching user:', error);
-            }
-        };
-
-        getLoggedInUser();
-    }, [userId]); // Fetch user data whenever userId changes
+            })
+            let user = await response.json()
+            setCurrentUser(user)
+        }
+        getLoggedInUser()
+    }, [])
 
     return (
-        <CurrentUser.Provider value={currentUser}>
+        <CurrentUser.Provider value={{ currentUser, setCurrentUser }}>
             {children}
         </CurrentUser.Provider>
-    );
+    )
 }
 
-export default CurrentUserProvider;
+export default CurrentUserProvider
