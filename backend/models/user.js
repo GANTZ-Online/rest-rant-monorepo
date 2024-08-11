@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     firstName: DataTypes.STRING,
     lastName: DataTypes.STRING,
     email: DataTypes.STRING,
-    passwordDigeset: DataTypes.STRING,
+    passwordDigest: DataTypes.STRING
   }, {
     sequelize,
     underscored: true,
