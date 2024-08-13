@@ -1,20 +1,19 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
-function NewCommentForm({ place }) {
+function PlaceDetails({ place, currentUser, editPlace, deletePlace }) {
     const [comment, setComment] = useState({
         text: "",
         stars: 1,
     });
 
     async function createComment(commentAttributes) {
-        const response = await fetch(`http://localhost:5000/places/${place.placeId}/comments`, {
+        const response = await fetch(`http://localhost:5001/places/${place.placeId}/comments`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json'
-				
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify(commentAttributes)
+            body: JSON.stringify(commentAttributes),
         });
 
         const newComment = await response.json();
@@ -23,8 +22,8 @@ function NewCommentForm({ place }) {
             ...prevPlace,
             comments: [
                 ...prevPlace.comments,
-                newComment
-            ]
+                newComment,
+            ],
         }));
     }
 
@@ -41,18 +40,54 @@ function NewCommentForm({ place }) {
         setComment({ text: "", stars: 1 });
     }
 
+    const comments = place.comments.map(comment => (
+        <CommentCard
+            key={comment.commentId}
+            comment={comment}
+            onDelete={() => deleteComment(comment)}
+        />
+    ));
+
+    let placeActions = null;
+
+    if (currentUser?.role === 'admin') {
+        placeActions = (
+            <>
+                <a className="btn btn-warning" onClick={editPlace}>
+                    Edit
+                </a>
+                <button type="button" className="btn btn-danger" onClick={deletePlace}>
+                    Delete
+                </button>
+            </>
+        );
+    }
+
     return (
-        <form onSubmit={handleSubmit}>
-            <textarea
-                name="text"
-                value={comment.text}
-                onChange={handleChange}
-                placeholder="Add your comment"
-                required
-            />
-            <button type="submit">Submit</button>
-        </form>
+        <main>
+            <div className="row">
+                <h4>
+                    Serving {place.cuisines}.
+                </h4>
+                <br />
+                {placeActions}
+            </div>
+            <div className="row">
+                {comments}
+            </div>
+            <form onSubmit={handleSubmit}>
+                <textarea
+                    name="text"
+                    value={comment.text}
+                    onChange={handleChange}
+                    placeholder="Add your comment"
+                    required
+                />
+                <button type="submit">Submit</button>
+            </form>
+        </main>
     );
 }
 
-export default NewCommentForm;
+export default PlaceDetails;
+

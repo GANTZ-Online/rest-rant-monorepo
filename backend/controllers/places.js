@@ -21,6 +21,10 @@ router.use(async (req, res, next) => {
 });
 
 router.post('/', async (req, res) => {
+    if(req.currentUser?.role !== 'admin'){
+        return res.status(403).json({ message: 'You are not allowed to add a place'});
+    }
+
     if (!req.body.pic) {
         req.body.pic = 'http://placekitten.com/400/400';
     }
@@ -61,6 +65,10 @@ router.get('/:placeId', async (req, res) => {
 });
 
 router.put('/:placeId', async (req, res) => {
+    if(req.currentUser?.role !== 'admin'){
+        return res.status(403).json({ message: 'You are not allowed to edit places'});
+    }
+
     let placeId = Number(req.params.placeId);
     if (isNaN(placeId)) {
         return res.status(404).json({ message: `Invalid id "${placeId}"` });
@@ -77,6 +85,10 @@ router.put('/:placeId', async (req, res) => {
 });
 
 router.delete('/:placeId', async (req, res) => {
+    if(req.currentUser?.role !== 'admin'){
+        return res.status(403).json({ message: 'You are not allowed to delete places'});
+    }
+
     let placeId = Number(req.params.placeId);
     if (isNaN(placeId)) {
         return res.status(404).json({ message: `Invalid id "${placeId}"` });

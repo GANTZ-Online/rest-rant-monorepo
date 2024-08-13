@@ -1,11 +1,10 @@
-import { useState, useEffect, useContext } from 'react'
+import { useContext } from 'react'
 import { useHistory } from "react-router";
 import { CurrentUser } from './contexts/CurrentUser';
 
 function Navigation() {
 
     const history = useHistory()
-
     const currentUser = useContext(CurrentUser)
 
     let loginActions = (
@@ -31,6 +30,18 @@ function Navigation() {
         )
     }
 
+    let addPlaceButton = null
+
+    if (currentUser?.role === 'admin') {
+        addPlaceButton = (
+            <li>
+                <a href="#" onClick={() => history.push("/places/new")}>
+                    Add Place
+                </a>
+            </li>
+        )
+    }
+
     return (
         <nav>
             <ul>
@@ -44,11 +55,7 @@ function Navigation() {
                         Places
                     </a>
                 </li>
-                <li>
-                    <a href="#" onClick={() => history.push("/places/new")}>
-                        Add Place
-                    </a>
-                </li>
+                {addPlaceButton}
                 {loginActions}
             </ul>
         </nav>
