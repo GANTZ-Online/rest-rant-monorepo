@@ -6,6 +6,7 @@ const cors = require('cors');
 const cookieSessions = require('cookie-session');
 const app = express();
 const defineCurrentUser = require('./middleware/defineCurrentUser');
+const path = require ('path');
 
 // Express Settings
 app.use(cookieSessions({
@@ -29,6 +30,11 @@ app.use('/users', require('./controllers/users'));
 app.use('/authentication', require('./controllers/authentication'));
 
 // Listen for Connections
+// serve static front end in production mode
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, 'client', 'build')));
+}
+
 app.listen(process.env.PORT, () => {
     console.log(`Listening on ${process.env.PORT}`);
 });
