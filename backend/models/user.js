@@ -26,6 +26,10 @@ module.exports = (sequelize, DataTypes) => {
       ]
     },
     passwordDigest: DataTypes.STRING
+  }, {
+    sequelize,
+    underscored: true,
+    modelName: 'User',
   });
 
   return User;

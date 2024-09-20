@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const cookieSessions = require('cookie-session');
 const app = express();
-const defineCurrentUser = require('./middleware/define-current-user');
+const defineCurrentUser = require('./middleware/defineCurrentUser');
 
 // Express Settings
 app.use(cookieSessions({
